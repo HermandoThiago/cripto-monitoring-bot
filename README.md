@@ -2,6 +2,8 @@
 
 Este projeto visa monitorar os preços de criptomoedas, como o Bitcoin, e enviar alertas de compra e venda em um grupo no Telegram. A integração é feita utilizando a API da Binance para obter informações de mercado e o Telegram para enviar notificações.
 
+A estratégia utilizada aqui usa o indicador de Bandas de Bollinger para gerar os sinais de compra e venda, é um estratégia simples, feita somente para demonstração da aplicação, personalize a estratégia da forma que desejar e obtenha sinais de compra e vendas diferentes.
+
 ## Configuração
 
 Antes de começar, é necessário configurar as seguintes variáveis de ambiente:
