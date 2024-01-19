@@ -10,6 +10,29 @@ group_id = os.environ["GROUP_ID_TELEGRAM"]  # telegram group id
 
 
 def send_message_to_telegram(message) -> Response:
+    """
+    Sends a message to a Telegram group using the Telegram Bot API.
+
+    Parameters:
+    - message (str): The text message to be sent to the Telegram group.
+
+    Returns:
+    - Response: The response object received from the Telegram API after attempting to send the message.
+
+    Raises:
+    - Exception: If an error occurs during the execution, an exception is caught and an error message is printed.
+
+    Note:
+    - This function relies on environment variables for Telegram bot credentials (`BOT_ID_TELEGRAM`) and the Telegram group ID (`GROUP_ID_TELEGRAM`).
+    - Make sure to load the environment variables using `load_dotenv()` before calling this function.
+    - The Telegram bot credentials should be obtained from BotFather (https://core.telegram.org/bots#botfather).
+
+    Example:
+    ```
+    telegram_message = "Hello, Telegram!"
+    response = send_message_to_telegram(telegram_message)
+    ```
+    """
     try:
         url = "https://api.telegram.org/bot" + str(telegram_bot_credential) + "/sendMessage?chat_id=" + str(group_id)
 

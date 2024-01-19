@@ -21,6 +21,45 @@ client = Client(api_key=api_key,
 
 
 class MonitoringPrice:
+    """
+    A class for monitoring price movements and generating signals based on a simple trading strategy.
+
+    Parameters:
+    - symbol (str): The trading pair symbol (e.g., 'BTCUSDT').
+    - timeframe (str): The timeframe for price data (e.g., '1h', '4h').
+    - position (int): Initial trading position (0 for neutral, 1 for long, -1 for short).
+
+    Methods:
+    - start_monitoring(historical_days: int) -> None:
+        Initiates the monitoring process by starting a threaded websocket connection for real-time price updates.
+
+    - get_most_recent(days: int) -> None:
+        Fetches historical price data for the specified number of days.
+
+    - stream_candles(msg) -> None:
+        Callback function to process and update real-time price data.
+
+    - define_strategy() -> None:
+        Applies a simple trading strategy based on Bollinger Bands to generate buy and sell signals.
+
+    - execute_messages() -> None:
+        Executes actions based on the generated signals, such as sending messages to a Telegram group.
+
+    Attributes:
+    - symbol (str): The trading pair symbol.
+    - timeframe (str): The timeframe for price data.
+    - available_intervals (list): List of available timeframe intervals.
+    - position (int): Current trading position.
+    - twm (ThreadedWebsocketManager): Binance ThreadedWebsocketManager instance.
+    - data (pd.DataFrame): Historical price data.
+    - prepared_data (pd.DataFrame): Processed data with signals.
+
+    Example:
+    ```
+    monitor = MonitoringPrice(symbol='BTCUSDT', timeframe='1h', position=0)
+    monitor.start_monitoring(historical_days=7)
+    ```
+    """
     def __init__(self, symbol: str, timeframe: str, position: int = 0) -> None:
         self.symbol = symbol
         self.timeframe = timeframe
@@ -33,6 +72,12 @@ class MonitoringPrice:
         self.prepared_data = None
 
     def start_monitoring(self, historical_days: int) -> None:
+        """
+        Initiates the monitoring process by starting a threaded websocket connection for real-time price updates.
+
+        Parameters:
+        - historical_days (int): Number of days of historical data to fetch initially.
+        """
         self.twm = ThreadedWebsocketManager()
         self.twm.start()
 
@@ -46,6 +91,12 @@ class MonitoringPrice:
             self.twm.join()
 
     def get_most_recent(self, days: int) -> None:
+        """
+        Fetches historical price data for the specified number of days.
+
+        Parameters:
+        - days (int): Number of days of historical data to fetch.
+        """
         now = datetime.utcnow()
         past = str(now - timedelta(days=days))
 
@@ -75,6 +126,12 @@ class MonitoringPrice:
         self.data = df
 
     def stream_candles(self, msg) -> None:
+        """
+        Callback function to process and update real-time price data.
+
+        Parameters:
+        - msg (dict): Real-time price data received through the websocket.
+        """
         event_time = pd.to_datetime(msg['E'], unit='ms')
         start_time = pd.to_datetime(msg['k']['t'], unit='ms')
         first = float(msg['k']['o'])
@@ -93,6 +150,9 @@ class MonitoringPrice:
             self.execute_messages()
 
     def define_strategy(self) -> None:
+        """
+        Applies a simple trading strategy based on Bollinger Bands to generate buy and sell signals.
+        """
         df = self.data.copy()
 
         df['sma'] = ta.ema(df['Close'], length=20)
@@ -110,6 +170,9 @@ class MonitoringPrice:
         self.prepared_data = df.copy()
 
     def execute_messages(self) -> None:
+        """
+        Executes actions based on the generated signals, such as sending messages to a Telegram group.
+        """
         try:
             last_row = self.prepared_data.iloc[-1]
 
