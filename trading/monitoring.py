@@ -60,6 +60,7 @@ class MonitoringPrice:
     monitor.start_monitoring(historical_days=7)
     ```
     """
+
     def __init__(self, symbol: str, timeframe: str, position: int = 0) -> None:
         self.symbol = symbol
         self.timeframe = timeframe
